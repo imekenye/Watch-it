@@ -1,0 +1,22 @@
+.footer {
+  grid-row: 7/8;
+  &__social {
+    display: flex;
+    align-items: center;
+    font-family: $Light;
+    img {
+      margin-right: 0.8rem;
+    }
+    p {
+      margin-right: 0.8rem;
+      color: $color-primary;
+      font-size: 1.6rem;
+    }
+  }
+  .wrapper {
+    padding: 2.6rem 0;
+    margin: 0 10%;
+    display: flex;
+    justify-content: space-between;
+  }
+}
