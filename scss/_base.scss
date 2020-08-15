@@ -21,4 +21,13 @@ body {
   display: grid;
   grid-template-columns: 1fr repeat(6, minmax(min-content, 18.8rem)) 1fr;
   grid-template-rows: 20vh 80vh repeat(4, min-content);
+
+  @include media('<=768px') {
+    grid-template-columns: 1fr;
+    grid-template-rows: 10vh 60vh repeat(4, min-content);
+  }
+  @include media('<=368px') {
+    grid-template-columns: 1fr;
+    grid-template-rows: 10vh 80vh repeat(4, min-content);
+  }
 }

@@ -18,5 +18,9 @@
     margin: 0 10%;
     display: flex;
     justify-content: space-between;
+    @include media('<=368px') {
+      justify-content: center;
+      flex-direction: column;
+    }
   }
 }
