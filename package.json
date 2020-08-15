@@ -12,5 +12,13 @@
   "devDependencies": {
     "node-sass": "^4.14.1",
     "parcel-bundler": "^1.12.4"
-  }
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "jquery": "^3.5.1",
+    "moment": "^2.27.0"
+  },
+  "browserslist": [
+    "since 2017-06"
+  ]
 }
