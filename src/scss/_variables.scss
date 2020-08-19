@@ -1,0 +1,31 @@
+@font-face {
+  font-family: SpaceRegular;
+  src: url(../../public/assets/fonts/SpaceGrotesk-Regular.otf)
+    format('opentype');
+}
+@font-face {
+  font-family: SpaceLight;
+  src: url(../../public/assets/fonts/SpaceGrotesk-Light.otf) format('opentype');
+}
+@font-face {
+  font-family: SpaceBold;
+  src: url(../../public/assets/fonts/SpaceGrotesk-Bold.otf) format('opentype');
+}
+@font-face {
+  font-family: SpaceSemiBold;
+  src: url(../../public/assets/fonts/SpaceGrotesk-SemiBold.otf)
+    format('opentype');
+}
+@font-face {
+  font-family: SpaceMedium;
+  src: url(../../public/assets/fonts/SpaceGrotesk-Medium.otf) format('opentype');
+}
+
+$Bold: SpaceBold;
+$SemiBold: SpaceSemiBold;
+$Regular: SpaceRegular;
+$Light: SpaceLight;
+$Medium: SpaceMedium;
+
+$color-primary: #ef7d31;
+$color-dark: #00031c;
