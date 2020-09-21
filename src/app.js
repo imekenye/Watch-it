@@ -1,22 +1,17 @@
 import './utils/import-jquery';
-import getPopular from './api/getPopular';
-import './scss/app.scss';
-import Shows from './components/Shows';
-import Tickets from './components/Tickets';
-import getNews from './api/getNews';
-import News from './components/News';
-import Modal from './components/Modal';
+import { getPopular, getNews } from './api';
+import { Shows, Tickets, News, Modal } from './components';
 import animation from './utils/animation';
+import './scss/app.scss';
 
 $(function () {
-  const linkShows = $('#link-show');
-  const linkNews = $('#link-news');
-  const linkTicket = $('#link-ticket');
-  const heroBtn = $('#hero-btn');
-  const overlay = $('#overlay');
-  const shows = $('#shows');
-  const newsContent = $('#news__content');
-  const ticketMovies = $('#ticket__movies');
+  const linkShows = $('#link-show'),
+    linkNews = $('#link-news'),
+    linkTicket = $('#link-ticket'),
+    heroBtn = $('#hero-btn'),
+    shows = $('#shows'),
+    newsContent = $('#news__content'),
+    ticketMovies = $('#ticket__movies');
 
   const app = async () => {
     animation(gsap);
@@ -53,6 +48,27 @@ $(function () {
     newsContent.append(newsResult);
 
     Modal();
+
+    // Ticket form validation
+
+    $('#form-ticket').submit((e) => {
+      if (!$('#ticketMovie-checkbox').is(':checked')) {
+        $('.error-checkbox').html(`*Choose movie please`);
+        e.preventDefault();
+      } else {
+        $('.error-checkbox').html('');
+        console.log(e.target);
+      }
+    });
+
+    // Mobile Responsiveness
+
+    $('.hamburger__menu,#link-show,#link-news,#link-ticket').click(async () => {
+      if ($(window).width() <= 768) {
+        await $('#nav').toggleClass('h-100');
+        $('.nav-container').toggleClass('mobile');
+      }
+    });
   };
   // init app
   app();

@@ -3,33 +3,33 @@ const animation = (gsap) => {
 
   /***************** Scroll trigger animation *******************/
 
-  gsap.fromTo(
-    '#shows',
-    {
-      scrollTrigger: '#shows',
-      x: 500,
-      opacity: 0,
-    },
-    { scrollTrigger: '#shows', x: 0, opacity: 1, duration: 1.5 }
-  );
-  gsap.fromTo(
-    '#ticket',
-    {
-      scrollTrigger: '#ticket',
-      x: -500,
-      opacity: 0,
-    },
-    { scrollTrigger: '#ticket', x: 0, opacity: 1, duration: 1.5 }
-  );
-  gsap.fromTo(
-    '#news',
-    {
-      scrollTrigger: '#news',
-      x: 500,
-      opacity: 0,
-    },
-    { scrollTrigger: '#news', x: 0, opacity: 1, duration: 1.5 }
-  );
+  //   gsap.fromTo(
+  //     '#shows',
+  //     {
+  //       scrollTrigger: '#shows',
+  //       x: 500,
+  //       opacity: 0,
+  //     },
+  //     { scrollTrigger: '#shows', x: 0, opacity: 1, duration: 1.5 }
+  //   );
+  //   gsap.fromTo(
+  //     '#ticket',
+  //     {
+  //       scrollTrigger: '#ticket',
+  //       x: -500,
+  //       opacity: 0,
+  //     },
+  //     { scrollTrigger: '#ticket', x: 0, opacity: 1, duration: 1.5 }
+  //   );
+  //   gsap.fromTo(
+  //     '#news',
+  //     {
+  //       scrollTrigger: '#news',
+  //       x: 500,
+  //       opacity: 0,
+  //     },
+  //     { scrollTrigger: '#news', x: 0, opacity: 1, duration: 1.5 }
+  //   );
 
   /***************** Hero images animation *******************/
 

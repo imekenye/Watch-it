@@ -1,6 +1,6 @@
 import getGenres from '../utils/getGenre';
 
-const Shows = async (movies) => {
+export const Shows = async (movies) => {
   const template = movies.slice(0, 12).map(
     (movie) =>
       movie.poster_path &&
@@ -20,5 +20,3 @@ const Shows = async (movies) => {
   );
   return template;
 };
-
-export default Shows;

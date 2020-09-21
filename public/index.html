@@ -9,35 +9,54 @@
     <!-- Header/Navigation -->
 
     <header id="header">
-      <div class="menu-icon">
-        <div class="menu-text"><span>Menu</span></div>
-        <div>
-          <div class="bar bar-1"></div>
-          <div class="bar bar-2"></div>
-          <div class="bar bar-3"></div>
-        </div>
-      </div>
-      <nav>
+      <!-- <img src="./assets/images/close.svg" id="close" /> -->
+
+      <nav id="nav">
         <div class="logo">
           <img src="./assets/images/logo2.svg" alt="" />
         </div>
-        <ul class="navigation">
-          <li class="navigation-list">
-            <a href="#" class="navigation-list__item" id="link-show">Shows</a>
-          </li>
-          <li class="navigation-list">
-            <a href="#" class="navigation-list__item" id="link-news">News</a>
-          </li>
-          <li class="navigation-list">
-            <a href="#" class="navigation-list__item" id="link-ticket"
-              >Get Ticket</a
-            >
-          </li>
-        </ul>
-        <div class="social-icons">
-          <img src="./assets/images/facebook.svg" alt="facebook" />
-          <img src="./assets/images/twitter.svg" alt="twitter" />
-          <img src="./assets/images/instagram.svg" alt="instagram" />
+
+        <div class="menu-icon">
+          <div class="menu-text" id="menu-text"><span>Menu</span></div>
+          <div class="menu-text" style="display: none" id="close">
+            <span>Close</span>
+          </div>
+          <div class="hamburger__menu">
+            <div class="bar bar-1"></div>
+            <div class="bar bar-2"></div>
+            <div class="bar bar-3"></div>
+          </div>
+        </div>
+
+        <div class="nav-container">
+          <ul class="navigation">
+            <li class="navigation-list">
+              <a href="#" class="navigation-list__item" id="link-show">Shows</a>
+            </li>
+            <li class="navigation-list">
+              <a href="#" class="navigation-list__item" id="link-news">News</a>
+            </li>
+            <li class="navigation-list">
+              <a href="#" class="navigation-list__item" id="link-ticket"
+                >Get Ticket</a
+              >
+            </li>
+          </ul>
+          <div class="social-icons">
+            <a href="https://www.facebook.com" target="_blank">
+              <img
+                src="./assets/images/facebook.svg"
+                alt="facebook"
+                target="_blank"
+              />
+            </a>
+            <a href="https://www.twitter.com" target="_blank">
+              <img src="./assets/images/twitter.svg" alt="twitter" />
+            </a>
+            <a href="https://www.instagram.com" target="_blank">
+              <img src="./assets/images/instagram.svg" alt="instagram" />
+            </a>
+          </div>
         </div>
       </nav>
     </header>
@@ -106,32 +125,46 @@
         <p>6pm - 12am</p>
       </div>
     </section>
+    
     <!-- trailer overlay-->
     <div id="overlay" hidden></div>
 
     <!-- Ticket Section -->
 
     <section class="ticket" id="ticket">
-      <form>
+      <form id="form-ticket">
         <h2>Get your <span>free ticket now</span></h2>
         <div class="ticket__form">
           <div class="ticket__form-inputs">
             <label for="name" class="ticket__form-label">Name</label>
-            <input type="text" class="ticket__form-input" />
+            <input
+              type="text"
+              class="ticket__form-input"
+              name="name"
+              required
+            />
             <label for="number" class="ticket__form-label">Phone number</label>
-            <input type="number" class="ticket__form-input" />
-            <label for="number" class="ticket__form-label"
-              >Number of People</label
+            <input type="number" class="ticket__form-input" required />
+            <label for="cars" class="ticket__form-label"
+              >Choose number of tickets:</label
             >
-            <input type="number" class="ticket__form-input" />
+            <select name="Tickets" id="tick">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+
             <label for="email" class="ticket__form-label"
               >Your email address</label
             >
-            <input type="email" class="ticket__form-input" />
+            <input type="email" class="ticket__form-input" required />
           </div>
 
           <div class="ticket__movies" id="ticket__movies"></div>
-          <button class="ticket__btn">Order Ticket</button>
+          <button class="ticket__btn" type="submit">Order Ticket</button>
+          <div class="error-checkbox"></div>
         </div>
       </form>
     </section>
@@ -143,11 +176,13 @@
       <div class="news__content" id="news__content"></div>
       <div class="news__footer">
         View the
-        <a href="https://www.boston.gov/parks/public-garden"
+        <a href="https://www.boston.gov/parks/public-garden" target="_blank"
           >Boston Public Garden</a
         >
         and
-        <a href="https://www.boston.com/section/news">Boston News Website</a>
+        <a href="https://www.boston.com/section/news" target="_blank"
+          >Boston News Website</a
+        >
         for more info .
       </div>
     </section>
@@ -187,9 +222,19 @@
         </div>
         <div class="footer__social">
           <p>Follow us on social media</p>
-          <img src="./assets/images/facebook.svg" alt="facebook" />
-          <img src="./assets/images/twitter.svg" alt="twitter" />
-          <img src="./assets/images/instagram.svg" alt="instagram" />
+          <a href="https://www.facebook.com" target="_blank">
+            <img
+              src="./assets/images/facebook.svg"
+              alt="facebook"
+              target="_blank"
+            />
+          </a>
+          <a href="https://www.twitter.com" target="_blank">
+            <img src="./assets/images/twitter.svg" alt="twitter" />
+          </a>
+          <a href="https://www.instagram.com" target="_blank">
+            <img src="./assets/images/instagram.svg" alt="instagram" />
+          </a>
         </div>
       </div>
     </footer>

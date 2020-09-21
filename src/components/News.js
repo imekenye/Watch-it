@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-const News = (news) => {
+export const News = (news) => {
   const template = news.map(
     (news) =>
       news.urlToImage &&
@@ -35,12 +35,10 @@ const News = (news) => {
 
           <button class="card__button"><a href=${
             news.url
-          }>Read Article</a></button>
+          } target="_blank">Read Article</a></button>
         </div>
         `
   );
 
   return template;
 };
-
-export default News;

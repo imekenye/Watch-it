@@ -11218,445 +11218,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = window.$ = window.jQuery = _jquery.default;
 
 exports.default = _default;
-},{"jquery":"../node_modules/jquery/dist/jquery.js"}],"../node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
-
-},{}],"../node_modules/path-browserify/index.js":[function(require,module,exports) {
-var process = require("process");
-// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
-// backported and transplited with Babel, with backwards-compat fixes
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function(path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function(path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-
-// path.relative(from, to)
-// posix version
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function (path) {
-  if (typeof path !== 'string') path = path + '';
-  if (path.length === 0) return '.';
-  var code = path.charCodeAt(0);
-  var hasRoot = code === 47 /*/*/;
-  var end = -1;
-  var matchedSlash = true;
-  for (var i = path.length - 1; i >= 1; --i) {
-    code = path.charCodeAt(i);
-    if (code === 47 /*/*/) {
-        if (!matchedSlash) {
-          end = i;
-          break;
-        }
-      } else {
-      // We saw the first non-path separator
-      matchedSlash = false;
-    }
-  }
-
-  if (end === -1) return hasRoot ? '/' : '.';
-  if (hasRoot && end === 1) {
-    // return '//';
-    // Backwards-compat fix:
-    return '/';
-  }
-  return path.slice(0, end);
-};
-
-function basename(path) {
-  if (typeof path !== 'string') path = path + '';
-
-  var start = 0;
-  var end = -1;
-  var matchedSlash = true;
-  var i;
-
-  for (i = path.length - 1; i >= 0; --i) {
-    if (path.charCodeAt(i) === 47 /*/*/) {
-        // If we reached a path separator that was not part of a set of path
-        // separators at the end of the string, stop now
-        if (!matchedSlash) {
-          start = i + 1;
-          break;
-        }
-      } else if (end === -1) {
-      // We saw the first non-path separator, mark this as the end of our
-      // path component
-      matchedSlash = false;
-      end = i + 1;
-    }
-  }
-
-  if (end === -1) return '';
-  return path.slice(start, end);
-}
-
-// Uses a mixed approach for backwards-compatibility, as ext behavior changed
-// in new Node.js versions, so only basename() above is backported here
-exports.basename = function (path, ext) {
-  var f = basename(path);
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-};
-
-exports.extname = function (path) {
-  if (typeof path !== 'string') path = path + '';
-  var startDot = -1;
-  var startPart = 0;
-  var end = -1;
-  var matchedSlash = true;
-  // Track the state of characters (if any) we see before our first dot and
-  // after any path separator we find
-  var preDotState = 0;
-  for (var i = path.length - 1; i >= 0; --i) {
-    var code = path.charCodeAt(i);
-    if (code === 47 /*/*/) {
-        // If we reached a path separator that was not part of a set of path
-        // separators at the end of the string, stop now
-        if (!matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-    if (end === -1) {
-      // We saw the first non-path separator, mark this as the end of our
-      // extension
-      matchedSlash = false;
-      end = i + 1;
-    }
-    if (code === 46 /*.*/) {
-        // If this is our first dot, mark it as the start of our extension
-        if (startDot === -1)
-          startDot = i;
-        else if (preDotState !== 1)
-          preDotState = 1;
-    } else if (startDot !== -1) {
-      // We saw a non-dot and non-path separator before our dot, so we should
-      // have a good chance at having a non-empty extension
-      preDotState = -1;
-    }
-  }
-
-  if (startDot === -1 || end === -1 ||
-      // We saw a non-dot character immediately before the dot
-      preDotState === 0 ||
-      // The (right-most) trimmed path component is exactly '..'
-      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-    return '';
-  }
-  return path.slice(startDot, end);
-};
-
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b'
-    ? function (str, start, len) { return str.substr(start, len) }
-    : function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    }
-;
-
-},{"process":"../node_modules/process/browser.js"}],"../node_modules/dotenv/lib/main.js":[function(require,module,exports) {
-var process = require("process");
-/*::
-
-type DotenvParseOptions = {
-  debug?: boolean
-}
-
-// keys and values from src
-type DotenvParseOutput = { [string]: string }
-
-type DotenvConfigOptions = {
-  path?: string, // path to .env file
-  encoding?: string, // encoding of .env file
-  debug?: string // turn on logging for debugging purposes
-}
-
-type DotenvConfigOutput = {
-  parsed?: DotenvParseOutput,
-  error?: Error
-}
-
-*/
-const fs = require('fs');
-
-const path = require('path');
-
-function log(message
-/*: string */
-) {
-  console.log("[dotenv][DEBUG] ".concat(message));
-}
-
-const NEWLINE = '\n';
-const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/;
-const RE_NEWLINES = /\\n/g;
-const NEWLINES_MATCH = /\n|\r|\r\n/; // Parses src into an Object
-
-function parse(src
-/*: string | Buffer */
-, options
-/*: ?DotenvParseOptions */
-)
-/*: DotenvParseOutput */
-{
-  const debug = Boolean(options && options.debug);
-  const obj = {}; // convert Buffers before splitting into lines and processing
-
-  src.toString().split(NEWLINES_MATCH).forEach(function (line, idx) {
-    // matching "KEY' and 'VAL' in 'KEY=VAL'
-    const keyValueArr = line.match(RE_INI_KEY_VAL); // matched?
-
-    if (keyValueArr != null) {
-      const key = keyValueArr[1]; // default undefined or missing values to empty string
-
-      let val = keyValueArr[2] || '';
-      const end = val.length - 1;
-      const isDoubleQuoted = val[0] === '"' && val[end] === '"';
-      const isSingleQuoted = val[0] === "'" && val[end] === "'"; // if single or double quoted, remove quotes
-
-      if (isSingleQuoted || isDoubleQuoted) {
-        val = val.substring(1, end); // if double quoted, expand newlines
-
-        if (isDoubleQuoted) {
-          val = val.replace(RE_NEWLINES, NEWLINE);
-        }
-      } else {
-        // remove surrounding whitespace
-        val = val.trim();
-      }
-
-      obj[key] = val;
-    } else if (debug) {
-      log("did not match key and value when parsing line ".concat(idx + 1, ": ").concat(line));
-    }
-  });
-  return obj;
-} // Populates process.env from .env file
-
-
-function config(options
-/*: ?DotenvConfigOptions */
-)
-/*: DotenvConfigOutput */
-{
-  let dotenvPath = path.resolve(process.cwd(), '.env');
-  let encoding
-  /*: string */
-  = 'utf8';
-  let debug = false;
-
-  if (options) {
-    if (options.path != null) {
-      dotenvPath = options.path;
-    }
-
-    if (options.encoding != null) {
-      encoding = options.encoding;
-    }
-
-    if (options.debug != null) {
-      debug = true;
-    }
-  }
-
-  try {
-    // specifying an encoding returns a string instead of a buffer
-    const parsed = parse(fs.readFileSync(dotenvPath, {
-      encoding
-    }), {
-      debug
-    });
-    Object.keys(parsed).forEach(function (key) {
-      if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
-        process.env[key] = parsed[key];
-      } else if (debug) {
-        log("\"".concat(key, "\" is already defined in `process.env` and will not be overwritten"));
-      }
-    });
-    return {
-      parsed
-    };
-  } catch (e) {
-    return {
-      error: e
-    };
-  }
-}
-
-module.exports.config = config;
-module.exports.parse = parse;
-},{"fs":"../node_modules/parcel-bundler/src/builtins/_empty.js","path":"../node_modules/path-browserify/index.js","process":"../node_modules/process/browser.js"}],"../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+},{"jquery":"../node_modules/jquery/dist/jquery.js"}],"../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -13210,13 +12772,475 @@ module.exports.default = axios;
 
 },{"./utils":"../node_modules/axios/lib/utils.js","./helpers/bind":"../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js","./defaults":"../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../node_modules/axios/lib/helpers/spread.js"}],"../node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"../node_modules/axios/lib/axios.js"}],"../src/api/getPopular.js":[function(require,module,exports) {
+},{"./lib/axios":"../node_modules/axios/lib/axios.js"}],"../src/api/getNews.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.getNews = void 0;
+
+var _axios = _interopRequireDefault(require("axios"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const NEWS_API = "https://newsapi.org/v2/everything?q=movie&apiKey=".concat("21d9d0ef67fb43248efbaa3a1754d22b");
+
+const getNews = async () => {
+  const {
+    data: {
+      articles
+    }
+  } = await _axios.default.get(NEWS_API);
+  return articles.slice(1, 13);
+};
+
+exports.getNews = getNews;
+},{"axios":"../node_modules/axios/index.js"}],"../node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+
+},{}],"../node_modules/path-browserify/index.js":[function(require,module,exports) {
+var process = require("process");
+// .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
+// backported and transplited with Babel, with backwards-compat fixes
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function(path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+
+// path.relative(from, to)
+// posix version
+exports.relative = function(from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  if (path.length === 0) return '.';
+  var code = path.charCodeAt(0);
+  var hasRoot = code === 47 /*/*/;
+  var end = -1;
+  var matchedSlash = true;
+  for (var i = path.length - 1; i >= 1; --i) {
+    code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        if (!matchedSlash) {
+          end = i;
+          break;
+        }
+      } else {
+      // We saw the first non-path separator
+      matchedSlash = false;
+    }
+  }
+
+  if (end === -1) return hasRoot ? '/' : '.';
+  if (hasRoot && end === 1) {
+    // return '//';
+    // Backwards-compat fix:
+    return '/';
+  }
+  return path.slice(0, end);
+};
+
+function basename(path) {
+  if (typeof path !== 'string') path = path + '';
+
+  var start = 0;
+  var end = -1;
+  var matchedSlash = true;
+  var i;
+
+  for (i = path.length - 1; i >= 0; --i) {
+    if (path.charCodeAt(i) === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          start = i + 1;
+          break;
+        }
+      } else if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // path component
+      matchedSlash = false;
+      end = i + 1;
+    }
+  }
+
+  if (end === -1) return '';
+  return path.slice(start, end);
+}
+
+// Uses a mixed approach for backwards-compatibility, as ext behavior changed
+// in new Node.js versions, so only basename() above is backported here
+exports.basename = function (path, ext) {
+  var f = basename(path);
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+exports.extname = function (path) {
+  if (typeof path !== 'string') path = path + '';
+  var startDot = -1;
+  var startPart = 0;
+  var end = -1;
+  var matchedSlash = true;
+  // Track the state of characters (if any) we see before our first dot and
+  // after any path separator we find
+  var preDotState = 0;
+  for (var i = path.length - 1; i >= 0; --i) {
+    var code = path.charCodeAt(i);
+    if (code === 47 /*/*/) {
+        // If we reached a path separator that was not part of a set of path
+        // separators at the end of the string, stop now
+        if (!matchedSlash) {
+          startPart = i + 1;
+          break;
+        }
+        continue;
+      }
+    if (end === -1) {
+      // We saw the first non-path separator, mark this as the end of our
+      // extension
+      matchedSlash = false;
+      end = i + 1;
+    }
+    if (code === 46 /*.*/) {
+        // If this is our first dot, mark it as the start of our extension
+        if (startDot === -1)
+          startDot = i;
+        else if (preDotState !== 1)
+          preDotState = 1;
+    } else if (startDot !== -1) {
+      // We saw a non-dot and non-path separator before our dot, so we should
+      // have a good chance at having a non-empty extension
+      preDotState = -1;
+    }
+  }
+
+  if (startDot === -1 || end === -1 ||
+      // We saw a non-dot character immediately before the dot
+      preDotState === 0 ||
+      // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+    return '';
+  }
+  return path.slice(startDot, end);
+};
+
+function filter (xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b'
+    ? function (str, start, len) { return str.substr(start, len) }
+    : function (str, start, len) {
+        if (start < 0) start = str.length + start;
+        return str.substr(start, len);
+    }
+;
+
+},{"process":"../node_modules/process/browser.js"}],"../node_modules/dotenv/lib/main.js":[function(require,module,exports) {
+var process = require("process");
+/*::
+
+type DotenvParseOptions = {
+  debug?: boolean
+}
+
+// keys and values from src
+type DotenvParseOutput = { [string]: string }
+
+type DotenvConfigOptions = {
+  path?: string, // path to .env file
+  encoding?: string, // encoding of .env file
+  debug?: string // turn on logging for debugging purposes
+}
+
+type DotenvConfigOutput = {
+  parsed?: DotenvParseOutput,
+  error?: Error
+}
+
+*/
+const fs = require('fs');
+
+const path = require('path');
+
+function log(message
+/*: string */
+) {
+  console.log("[dotenv][DEBUG] ".concat(message));
+}
+
+const NEWLINE = '\n';
+const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/;
+const RE_NEWLINES = /\\n/g;
+const NEWLINES_MATCH = /\n|\r|\r\n/; // Parses src into an Object
+
+function parse(src
+/*: string | Buffer */
+, options
+/*: ?DotenvParseOptions */
+)
+/*: DotenvParseOutput */
+{
+  const debug = Boolean(options && options.debug);
+  const obj = {}; // convert Buffers before splitting into lines and processing
+
+  src.toString().split(NEWLINES_MATCH).forEach(function (line, idx) {
+    // matching "KEY' and 'VAL' in 'KEY=VAL'
+    const keyValueArr = line.match(RE_INI_KEY_VAL); // matched?
+
+    if (keyValueArr != null) {
+      const key = keyValueArr[1]; // default undefined or missing values to empty string
+
+      let val = keyValueArr[2] || '';
+      const end = val.length - 1;
+      const isDoubleQuoted = val[0] === '"' && val[end] === '"';
+      const isSingleQuoted = val[0] === "'" && val[end] === "'"; // if single or double quoted, remove quotes
+
+      if (isSingleQuoted || isDoubleQuoted) {
+        val = val.substring(1, end); // if double quoted, expand newlines
+
+        if (isDoubleQuoted) {
+          val = val.replace(RE_NEWLINES, NEWLINE);
+        }
+      } else {
+        // remove surrounding whitespace
+        val = val.trim();
+      }
+
+      obj[key] = val;
+    } else if (debug) {
+      log("did not match key and value when parsing line ".concat(idx + 1, ": ").concat(line));
+    }
+  });
+  return obj;
+} // Populates process.env from .env file
+
+
+function config(options
+/*: ?DotenvConfigOptions */
+)
+/*: DotenvConfigOutput */
+{
+  let dotenvPath = path.resolve(process.cwd(), '.env');
+  let encoding
+  /*: string */
+  = 'utf8';
+  let debug = false;
+
+  if (options) {
+    if (options.path != null) {
+      dotenvPath = options.path;
+    }
+
+    if (options.encoding != null) {
+      encoding = options.encoding;
+    }
+
+    if (options.debug != null) {
+      debug = true;
+    }
+  }
+
+  try {
+    // specifying an encoding returns a string instead of a buffer
+    const parsed = parse(fs.readFileSync(dotenvPath, {
+      encoding
+    }), {
+      debug
+    });
+    Object.keys(parsed).forEach(function (key) {
+      if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
+        process.env[key] = parsed[key];
+      } else if (debug) {
+        log("\"".concat(key, "\" is already defined in `process.env` and will not be overwritten"));
+      }
+    });
+    return {
+      parsed
+    };
+  } catch (e) {
+    return {
+      error: e
+    };
+  }
+}
+
+module.exports.config = config;
+module.exports.parse = parse;
+},{"fs":"../node_modules/parcel-bundler/src/builtins/_empty.js","path":"../node_modules/path-browserify/index.js","process":"../node_modules/process/browser.js"}],"../src/api/getPopular.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getPopular = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -13235,81 +13259,61 @@ const getPopular = async () => {
   return results;
 };
 
-var _default = getPopular;
+exports.getPopular = getPopular;
+},{"dotenv":"../node_modules/dotenv/lib/main.js","axios":"../node_modules/axios/index.js"}],"../src/api/fetchTrailer.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _axios = _interopRequireDefault(require("axios"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const fetchTrailer = async movie_id => {
+  const {
+    data: {
+      results
+    }
+  } = await _axios.default.get("https://api.themoviedb.org/3/movie/".concat(movie_id, "/videos?api_key=").concat("0bbb1ba871544114526f203d9579cb98"));
+  return results;
+};
+
+var _default = fetchTrailer;
 exports.default = _default;
-},{"dotenv":"../node_modules/dotenv/lib/main.js","axios":"../node_modules/axios/index.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
+},{"axios":"../node_modules/axios/index.js"}],"../src/api/index.js":[function(require,module,exports) {
+"use strict";
 
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "getNews", {
+  enumerable: true,
+  get: function () {
+    return _getNews.getNews;
   }
-
-  return bundleURL;
-}
-
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
+});
+Object.defineProperty(exports, "getPopular", {
+  enumerable: true,
+  get: function () {
+    return _getPopular.getPopular;
   }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-
-function updateLink(link) {
-  var newLink = link.cloneNode();
-
-  newLink.onload = function () {
-    link.remove();
-  };
-
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-
-var cssTimeout = null;
-
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
+});
+Object.defineProperty(exports, "fetchTrailer", {
+  enumerable: true,
+  get: function () {
+    return _fetchTrailer.fetchTrailer;
   }
+});
 
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
+var _getNews = require("./getNews");
 
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
-    }
+var _getPopular = require("./getPopular");
 
-    cssTimeout = null;
-  }, 50);
-}
-
-module.exports = reloadCSS;
-},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../src/scss/app.scss":[function(require,module,exports) {
-var reloadCSS = require('_css_loader');
-
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"./../../public/assets/fonts/SpaceGrotesk-Regular.otf":[["SpaceGrotesk-Regular.de94e126.otf","assets/fonts/SpaceGrotesk-Regular.otf"],"assets/fonts/SpaceGrotesk-Regular.otf"],"./../../public/assets/fonts/SpaceGrotesk-Light.otf":[["SpaceGrotesk-Light.0ad07965.otf","assets/fonts/SpaceGrotesk-Light.otf"],"assets/fonts/SpaceGrotesk-Light.otf"],"./../../public/assets/fonts/SpaceGrotesk-Bold.otf":[["SpaceGrotesk-Bold.2a9074ae.otf","assets/fonts/SpaceGrotesk-Bold.otf"],"assets/fonts/SpaceGrotesk-Bold.otf"],"./../../public/assets/fonts/SpaceGrotesk-SemiBold.otf":[["SpaceGrotesk-SemiBold.86d2436c.otf","assets/fonts/SpaceGrotesk-SemiBold.otf"],"assets/fonts/SpaceGrotesk-SemiBold.otf"],"./../../public/assets/fonts/SpaceGrotesk-Medium.otf":[["SpaceGrotesk-Medium.85607eba.otf","assets/fonts/SpaceGrotesk-Medium.otf"],"assets/fonts/SpaceGrotesk-Medium.otf"],"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../src/utils/genres.js":[function(require,module,exports) {
+var _fetchTrailer = require("./fetchTrailer");
+},{"./getNews":"../src/api/getNews.js","./getPopular":"../src/api/getPopular.js","./fetchTrailer":"../src/api/fetchTrailer.js"}],"../src/utils/genres.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13404,7 +13408,7 @@ exports.default = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.Shows = void 0;
 
 var _getGenre = _interopRequireDefault(require("../utils/getGenre"));
 
@@ -13415,49 +13419,8 @@ const Shows = async movies => {
   return template;
 };
 
-var _default = Shows;
-exports.default = _default;
-},{"../utils/getGenre":"../src/utils/getGenre.js"}],"../src/components/Tickets.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-const Tickets = async movies => {
-  const template = movies.slice(0, 12).map(movie => movie.poster_path && "\n      <div class=\"ticket__movie\">\n            <input type=\"checkbox\" />\n            <div class=\"ticket__movie-img\">\n             <img id=\"movie\" src=https://image.tmdb.org/t/p/w500/".concat(movie.poster_path, " data-movie-id=").concat(movie.id, " />\n            </div>\n            <div class=\"ticket__movie-text\">\n              <h3>").concat(movie.title.length >= 10 ? movie.title.substr(0, 15) + ' ...' : movie.title, "</h3>\n              <p>Date: Aug 05</p>\n              <p>Time: 6:00 pm</p>\n            </div>\n      </div>\n      "));
-  return template;
-};
-
-var _default = Tickets;
-exports.default = _default;
-},{}],"../src/api/getNews.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _axios = _interopRequireDefault(require("axios"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const NEWS_API = "https://newsapi.org/v2/everything?q=movie&apiKey=".concat("21d9d0ef67fb43248efbaa3a1754d22b");
-
-const getNews = async () => {
-  const {
-    data: {
-      articles
-    }
-  } = await _axios.default.get(NEWS_API);
-  return articles.slice(1, 13);
-};
-
-var _default = getNews;
-exports.default = _default;
-},{"axios":"../node_modules/axios/index.js"}],"../node_modules/moment/moment.js":[function(require,module,exports) {
+exports.Shows = Shows;
+},{"../utils/getGenre":"../src/utils/getGenre.js"}],"../node_modules/moment/moment.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 //! moment.js
@@ -19135,49 +19098,92 @@ var global = arguments[3];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.News = void 0;
 
 var _moment = _interopRequireDefault(require("moment"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const News = news => {
-  const template = news.map(news => news.urlToImage && "\n        <div class=\"card\">\n          \n          <div class=\"card__image\">\n            <img\n              src=".concat(news.urlToImage, "\n              alt=\"\"\n              \n            />\n          </div>\n\n          <div class=\"card__body\">\n            <p>").concat((0, _moment.default)(news.publishedAt).format('MMM Do YY'), " | <span>").concat(news.author, "</span></p>\n            <h3>\n              ").concat(news.title.length >= 10 ? news.title.substr(0, 45) + ' ...' : news.title, "\n            </h3>\n            <div class=\"card__content\">\n              <p>\n                ").concat(news.description, "\n              </p>\n            </div>\n          </div>\n\n          <button class=\"card__button\"><a href=").concat(news.url, ">Read Article</a></button>\n        </div>\n        "));
+  const template = news.map(news => news.urlToImage && "\n        <div class=\"card\">\n          \n          <div class=\"card__image\">\n            <img\n              src=".concat(news.urlToImage, "\n              alt=\"\"\n              \n            />\n          </div>\n\n          <div class=\"card__body\">\n            <p>").concat((0, _moment.default)(news.publishedAt).format('MMM Do YY'), " | <span>").concat(news.author, "</span></p>\n            <h3>\n              ").concat(news.title.length >= 10 ? news.title.substr(0, 45) + ' ...' : news.title, "\n            </h3>\n            <div class=\"card__content\">\n              <p>\n                ").concat(news.description, "\n              </p>\n            </div>\n          </div>\n\n          <button class=\"card__button\"><a href=").concat(news.url, " target=\"_blank\">Read Article</a></button>\n        </div>\n        "));
   return template;
 };
 
-var _default = News;
-exports.default = _default;
-},{"moment":"../node_modules/moment/moment.js"}],"../src/api/fetchTrailer.js":[function(require,module,exports) {
+exports.News = News;
+},{"moment":"../node_modules/moment/moment.js"}],"../src/utils/displayDates.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.displayDates = void 0;
 
-var _axios = _interopRequireDefault(require("axios"));
+const displayDates = i => {
+  let dateNumber = 5;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const fetchTrailer = async movie_id => {
-  const {
-    data: {
-      results
-    }
-  } = await _axios.default.get("https://api.themoviedb.org/3/movie/".concat(movie_id, "/videos?api_key=").concat("0bbb1ba871544114526f203d9579cb98"));
-  return results;
+  if (i === 3 || i === 4 || i === 5) {
+    dateNumber = dateNumber + 1;
+    return dateNumber;
+  } else if (i === 6 || i === 7 || i === 8) {
+    dateNumber = dateNumber + 2;
+    return dateNumber;
+  } else if (i === 9 || i === 10 || i === 11) {
+    dateNumber = dateNumber + 3;
+    return dateNumber;
+  } else {
+    return dateNumber;
+  }
 };
 
-var _default = fetchTrailer;
-exports.default = _default;
-},{"axios":"../node_modules/axios/index.js"}],"../src/components/Modal.js":[function(require,module,exports) {
+exports.displayDates = displayDates;
+},{}],"../src/utils/displayTime.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.displayTime = void 0;
+
+const displayTime = i => {
+  let timeNumber = 6;
+
+  if (i === 1 || i === 4 || i === 7 || i === 10) {
+    timeNumber = timeNumber + 3;
+    return timeNumber;
+  } else if (i === 2 || i === 5 || i === 8 || i === 11) {
+    timeNumber = 11;
+    return timeNumber;
+  } else {
+    return timeNumber;
+  }
+};
+
+exports.displayTime = displayTime;
+},{}],"../src/components/Tickets.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Tickets = void 0;
+
+var _displayDates = require("../utils/displayDates");
+
+var _displayTime = require("../utils/displayTime");
+
+const Tickets = async movies => {
+  const template = movies.slice(0, 12).map((movie, i) => movie.poster_path && "\n      <div class=\"ticket__movie\">\n            <input type=\"checkbox\" id=\"ticketMovie-checkbox\"/>\n            <div class=\"ticket__movie-img\">\n             <img id=\"movie\" src=https://image.tmdb.org/t/p/w500/".concat(movie.poster_path, " data-movie-id=").concat(movie.id, " />\n            </div>\n            <div class=\"ticket__movie-text\">\n              <h3>").concat(movie.title.length >= 10 ? movie.title.substr(0, 15) + ' ...' : movie.title, "</h3>\n              <p>Date: Aug 0").concat((0, _displayDates.displayDates)(i), "</p>\n              <p>Time: ").concat((0, _displayTime.displayTime)(i), ":00 pm</p>\n            </div>\n      </div>\n      "));
+  return template;
+};
+
+exports.Tickets = Tickets;
+},{"../utils/displayDates":"../src/utils/displayDates.js","../utils/displayTime":"../src/utils/displayTime.js"}],"../src/components/TrailerModal.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Modal = void 0;
 
 var _fetchTrailer = _interopRequireDefault(require("../api/fetchTrailer"));
 
@@ -19205,9 +19211,46 @@ const Modal = () => {
   });
 };
 
-var _default = Modal;
-exports.default = _default;
-},{"../api/fetchTrailer":"../src/api/fetchTrailer.js"}],"../src/utils/animation.js":[function(require,module,exports) {
+exports.Modal = Modal;
+},{"../api/fetchTrailer":"../src/api/fetchTrailer.js"}],"../src/components/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "Shows", {
+  enumerable: true,
+  get: function () {
+    return _Shows.Shows;
+  }
+});
+Object.defineProperty(exports, "News", {
+  enumerable: true,
+  get: function () {
+    return _News.News;
+  }
+});
+Object.defineProperty(exports, "Tickets", {
+  enumerable: true,
+  get: function () {
+    return _Tickets.Tickets;
+  }
+});
+Object.defineProperty(exports, "Modal", {
+  enumerable: true,
+  get: function () {
+    return _TrailerModal.Modal;
+  }
+});
+
+var _Shows = require("./Shows");
+
+var _News = require("./News");
+
+var _Tickets = require("./Tickets");
+
+var _TrailerModal = require("./TrailerModal");
+},{"./Shows":"../src/components/Shows.js","./News":"../src/components/News.js","./Tickets":"../src/components/Tickets.js","./TrailerModal":"../src/components/TrailerModal.js"}],"../src/utils/animation.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19218,37 +19261,34 @@ exports.default = void 0;
 const animation = gsap => {
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   /***************** Scroll trigger animation *******************/
+  //   gsap.fromTo(
+  //     '#shows',
+  //     {
+  //       scrollTrigger: '#shows',
+  //       x: 500,
+  //       opacity: 0,
+  //     },
+  //     { scrollTrigger: '#shows', x: 0, opacity: 1, duration: 1.5 }
+  //   );
+  //   gsap.fromTo(
+  //     '#ticket',
+  //     {
+  //       scrollTrigger: '#ticket',
+  //       x: -500,
+  //       opacity: 0,
+  //     },
+  //     { scrollTrigger: '#ticket', x: 0, opacity: 1, duration: 1.5 }
+  //   );
+  //   gsap.fromTo(
+  //     '#news',
+  //     {
+  //       scrollTrigger: '#news',
+  //       x: 500,
+  //       opacity: 0,
+  //     },
+  //     { scrollTrigger: '#news', x: 0, opacity: 1, duration: 1.5 }
+  //   );
 
-  gsap.fromTo('#shows', {
-    scrollTrigger: '#shows',
-    x: 500,
-    opacity: 0
-  }, {
-    scrollTrigger: '#shows',
-    x: 0,
-    opacity: 1,
-    duration: 1.5
-  });
-  gsap.fromTo('#ticket', {
-    scrollTrigger: '#ticket',
-    x: -500,
-    opacity: 0
-  }, {
-    scrollTrigger: '#ticket',
-    x: 0,
-    opacity: 1,
-    duration: 1.5
-  });
-  gsap.fromTo('#news', {
-    scrollTrigger: '#news',
-    x: 500,
-    opacity: 0
-  }, {
-    scrollTrigger: '#news',
-    x: 0,
-    opacity: 1,
-    duration: 1.5
-  });
   /***************** Hero images animation *******************/
 
   gsap.fromTo('.hero__image1', {
@@ -19306,38 +19346,101 @@ const animation = gsap => {
 
 var _default = animation;
 exports.default = _default;
-},{}],"../src/app.js":[function(require,module,exports) {
+},{}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+
+  return bundleURL;
+}
+
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+
+  return '/';
+}
+
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
+}
+
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+
+function updateLink(link) {
+  var newLink = link.cloneNode();
+
+  newLink.onload = function () {
+    link.remove();
+  };
+
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+
+var cssTimeout = null;
+
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+
+    cssTimeout = null;
+  }, 50);
+}
+
+module.exports = reloadCSS;
+},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../src/scss/app.scss":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
+
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"./../../public/assets/fonts/SpaceGrotesk-Regular.otf":[["SpaceGrotesk-Regular.de94e126.otf","assets/fonts/SpaceGrotesk-Regular.otf"],"assets/fonts/SpaceGrotesk-Regular.otf"],"./../../public/assets/fonts/SpaceGrotesk-Light.otf":[["SpaceGrotesk-Light.0ad07965.otf","assets/fonts/SpaceGrotesk-Light.otf"],"assets/fonts/SpaceGrotesk-Light.otf"],"./../../public/assets/fonts/SpaceGrotesk-Bold.otf":[["SpaceGrotesk-Bold.2a9074ae.otf","assets/fonts/SpaceGrotesk-Bold.otf"],"assets/fonts/SpaceGrotesk-Bold.otf"],"./../../public/assets/fonts/SpaceGrotesk-SemiBold.otf":[["SpaceGrotesk-SemiBold.86d2436c.otf","assets/fonts/SpaceGrotesk-SemiBold.otf"],"assets/fonts/SpaceGrotesk-SemiBold.otf"],"./../../public/assets/fonts/SpaceGrotesk-Medium.otf":[["SpaceGrotesk-Medium.85607eba.otf","assets/fonts/SpaceGrotesk-Medium.otf"],"assets/fonts/SpaceGrotesk-Medium.otf"],"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../src/app.js":[function(require,module,exports) {
 "use strict";
 
 require("./utils/import-jquery");
 
-var _getPopular = _interopRequireDefault(require("./api/getPopular"));
+var _api = require("./api");
 
-require("./scss/app.scss");
-
-var _Shows = _interopRequireDefault(require("./components/Shows"));
-
-var _Tickets = _interopRequireDefault(require("./components/Tickets"));
-
-var _getNews = _interopRequireDefault(require("./api/getNews"));
-
-var _News = _interopRequireDefault(require("./components/News"));
-
-var _Modal = _interopRequireDefault(require("./components/Modal"));
+var _components = require("./components");
 
 var _animation = _interopRequireDefault(require("./utils/animation"));
+
+require("./scss/app.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 $(function () {
-  const linkShows = $('#link-show');
-  const linkNews = $('#link-news');
-  const linkTicket = $('#link-ticket');
-  const heroBtn = $('#hero-btn');
-  const overlay = $('#overlay');
-  const shows = $('#shows');
-  const newsContent = $('#news__content');
-  const ticketMovies = $('#ticket__movies');
+  const linkShows = $('#link-show'),
+        linkNews = $('#link-news'),
+        linkTicket = $('#link-ticket'),
+        heroBtn = $('#hero-btn'),
+        shows = $('#shows'),
+        newsContent = $('#news__content'),
+        ticketMovies = $('#ticket__movies');
 
   const app = async () => {
     (0, _animation.default)(gsap);
@@ -19369,25 +19472,42 @@ $(function () {
     });
     /***************** Display movies/shows section *******************/
 
-    const results = await (0, _getPopular.default)();
-    const showsResult = await (0, _Shows.default)(results);
+    const results = await (0, _api.getPopular)();
+    const showsResult = await (0, _components.Shows)(results);
     shows.append(showsResult);
     /*********** Append movies in ticket section ***********/
 
-    const ticketResults = await (0, _Tickets.default)(results);
+    const ticketResults = await (0, _components.Tickets)(results);
     ticketMovies.append(ticketResults);
     /*********** Append News section ***********/
 
-    const news = await (0, _getNews.default)();
-    const newsResult = await (0, _News.default)(news);
+    const news = await (0, _api.getNews)();
+    const newsResult = await (0, _components.News)(news);
     newsContent.append(newsResult);
-    (0, _Modal.default)();
+    (0, _components.Modal)(); // Ticket form validation
+
+    $('#form-ticket').submit(e => {
+      if (!$('#ticketMovie-checkbox').is(':checked')) {
+        $('.error-checkbox').html("*Choose movie please");
+        e.preventDefault();
+      } else {
+        $('.error-checkbox').html('');
+        console.log(e.target);
+      }
+    }); // Mobile Responsiveness
+
+    $('.hamburger__menu,#link-show,#link-news,#link-ticket').click(async () => {
+      if ($(window).width() <= 768) {
+        await $('#nav').toggleClass('h-100');
+        $('.nav-container').toggleClass('mobile');
+      }
+    });
   }; // init app
 
 
   app();
 });
-},{"./utils/import-jquery":"../src/utils/import-jquery.js","./api/getPopular":"../src/api/getPopular.js","./scss/app.scss":"../src/scss/app.scss","./components/Shows":"../src/components/Shows.js","./components/Tickets":"../src/components/Tickets.js","./api/getNews":"../src/api/getNews.js","./components/News":"../src/components/News.js","./components/Modal":"../src/components/Modal.js","./utils/animation":"../src/utils/animation.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./utils/import-jquery":"../src/utils/import-jquery.js","./api":"../src/api/index.js","./components":"../src/components/index.js","./utils/animation":"../src/utils/animation.js","./scss/app.scss":"../src/scss/app.scss"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -19415,7 +19535,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50751" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54074" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

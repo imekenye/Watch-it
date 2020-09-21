@@ -3,11 +3,9 @@ import axios from 'axios';
 
 const POPULAR_MOVIE_API = `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.API_KEY}`;
 
-const getPopular = async () => {
+export const getPopular = async () => {
   const {
     data: { results },
   } = await axios.get(`${POPULAR_MOVIE_API}`);
   return results;
 };
-
-export default getPopular;

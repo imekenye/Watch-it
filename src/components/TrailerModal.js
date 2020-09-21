@@ -1,6 +1,6 @@
 import fetchTrailer from '../api/fetchTrailer';
 
-const Modal = () => {
+export const Modal = () => {
   document.addEventListener('click', (e) => {
     const movieId = e.target.dataset.movieId;
     if (e.target.tagName.toLowerCase() === 'img') {
@@ -20,5 +20,3 @@ const Modal = () => {
     }
   });
 };
-
-export default Modal;
